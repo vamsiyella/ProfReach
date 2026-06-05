@@ -11,14 +11,7 @@
 // In production, replace with local bundled import after: npm install @mlc-ai/web-llm
 // import * as webllm from "@mlc-ai/web-llm";
 // For development/testing, we use a dynamic CDN import:
-let webllm = null;
-
-async function loadWebLLM() {
-  if (webllm) return webllm;
-  // eslint-disable-next-line no-undef
-  webllm = await import("https://esm.run/@mlc-ai/web-llm");
-  return webllm;
-}
+//import * as webllm from "@mlc-ai/web-llm";
 
 // ─── State ────────────────────────────────────────────────────────────────
 
@@ -115,15 +108,14 @@ async function checkStoredLicense() {
 
 // ─── Model Loading ────────────────────────────────────────────────────────
 
-async function initEngine(progressCallback) {
+/*async function initEngine(progressCallback) {
   if (state.engine && state.modelLoaded) return state.engine;
   if (state.modelLoading) return null;
 
   state.modelLoading = true;
 
   try {
-    const wllm = await loadWebLLM();
-    state.engine = new wllm.MLCEngine();
+    state.engine = new webllm.MLCEngine();
 
     await state.engine.reload(MODEL_ID, {
       initProgressCallback: (report) => {
@@ -142,7 +134,7 @@ async function initEngine(progressCallback) {
     state.modelLoading = false;
     throw err;
   }
-}
+} */
 
 // ─── Email Generation ─────────────────────────────────────────────────────
 
@@ -247,7 +239,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     }
 
     case "INIT_MODEL": {
-      // Popup tells background to start loading the model
+      /* // Popup tells background to start loading the model
       initEngine((progress) => {
         // Broadcast progress to any open popup
         chrome.runtime.sendMessage({ type: "MODEL_PROGRESS", payload: progress })
@@ -255,7 +247,11 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       })
         .then(() => sendResponse({ success: true }))
         .catch((err) => sendResponse({ success: false, error: err.message }));
+      return true; */
+
+      sendResponse({ success: true });
       return true;
+
     }
 
     case "GET_MODEL_STATUS": {
@@ -268,7 +264,12 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     }
 
     case "GENERATE_EMAIL": {
-      const { studentProfile, professorData } = payload;
+
+      sendResponse({ success: false, error: "USE_POPUP_ENGINE" });
+      return true;  
+
+
+      /* const { studentProfile, professorData } = payload;
       generateEmail(studentProfile, professorData, (delta, full) => {
         chrome.runtime.sendMessage({
           type: "EMAIL_CHUNK",
@@ -277,7 +278,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       })
         .then((email) => sendResponse({ success: true, email }))
         .catch((err) => sendResponse({ success: false, error: err.message }));
-      return true;
+      return true; */
     }
 
     default:

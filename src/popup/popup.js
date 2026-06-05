@@ -5,6 +5,35 @@
 
 "use strict";
 
+
+
+import * as webllm from "@mlc-ai/web-llm";
+
+const engineState = {
+  engine: null,
+  loaded: false,
+  loading: false,
+};
+
+async function getEngine(onProgress) {
+  if (engineState.engine && engineState.loaded) return engineState.engine;
+  if (engineState.loading) return null;
+
+  engineState.loading = true;
+  engineState.engine = new webllm.MLCEngine();
+
+  await engineState.engine.reload("Phi-3-mini-4k-instruct-q4f16_1-MLC", {
+    initProgressCallback: (report) => {
+      const pct = Math.round(report.progress * 100);
+      onProgress?.(pct, report.text);
+    },
+  });
+
+  engineState.loaded = true;
+  engineState.loading = false;
+  return engineState.engine;
+}
+
 // ─── View Management ──────────────────────────────────────────────────────
 
 const views = {
@@ -178,24 +207,19 @@ const modelFill = document.getElementById("model-progress-fill");
 const modelText = document.getElementById("model-status-text");
 
 async function initModel() {
-  const { loaded, loading, progress } = await chrome.runtime.sendMessage({
-    type: "GET_MODEL_STATUS",
-  });
-
-  if (loaded) {
-    modelBar.classList.add("hidden");
-    return;
-  }
-
   modelBar.classList.remove("hidden");
-  if (progress > 0) {
-    modelFill.style.width = `${progress}%`;
-    modelText.textContent = `Loading AI model… ${progress}%`;
-  }
+  modelText.textContent = "Loading AI model…";
 
-  if (!loading) {
-    chrome.runtime.sendMessage({ type: "INIT_MODEL" });
-  }
+  getEngine((pct, text) => {
+    modelFill.style.width = `${pct}%`;
+    modelText.textContent = text || `Loading AI model… ${pct}%`;
+    if (pct >= 100) {
+      setTimeout(() => modelBar.classList.add("hidden"), 800);
+    }
+  }).catch((err) => {
+    modelText.textContent = "Model failed to load: " + err.message;
+    console.error(err);
+  });
 }
 
 // Listen for progress updates from background
@@ -285,10 +309,37 @@ async function doGenerate(followUp = false) {
   }
 
   try {
-    const response = await chrome.runtime.sendMessage({
-      type: "GENERATE_EMAIL",
-      payload: { studentProfile: profile, professorData: profData },
+    const engine = engineState.engine;
+    if (!engine || !engineState.loaded) {
+      showToast("AI model still loading — try again in a moment", true);
+      setEmailGenerating(false);
+      generateBtn.disabled = false;
+      if (regenerateBtn) regenerateBtn.disabled = false;
+      return;
+    }
+
+    const prompt = buildPrompt(profile, profData);
+    let fullText = "";
+
+    const chunks = await engine.chat.completions.create({
+      messages: [{ role: "user", content: prompt }],
+      stream: true,
+      temperature: 0.7,
+      max_tokens: 400,
     });
+
+    for await (const chunk of chunks) {
+      fullText += chunk.choices[0]?.delta?.content ?? "";
+      renderEmailChunk(fullText);
+    }
+
+    setEmailGenerating(false);
+    renderEmailChunk(fullText);
+    document.getElementById("email-output").dataset.hasContent = "true";
+    document.getElementById("email-output").classList.remove("hidden");
+    document.getElementById("email-placeholder").classList.add("hidden");
+    generateBtn.disabled = false;
+    if (regenerateBtn) regenerateBtn.disabled = false;
 
     setEmailGenerating(false);
 
@@ -442,5 +493,43 @@ async function init() {
     document.getElementById("generate-btn").disabled = !name;
   });
 });
+
+function buildPrompt(studentProfile, professorData) {
+  return `You are an expert at writing professional cold emails from high school students to professors.
+
+  Write a concise, sincere, and personalized cold email. The email should:
+  - Be 150-200 words maximum
+  - Have a compelling subject line
+  - Open with a specific reference to the professor's research (not generic flattery)
+  - Clearly state who the student is and their relevant experience
+  - Make a specific, actionable ask (informational interview, lab visit, reading a paper together, etc.)
+  - Sound like a thoughtful high schooler, not a corporate template
+  - Avoid buzzwords and clichés
+
+  FORMAT YOUR RESPONSE EXACTLY AS:
+  SUBJECT: [subject line here]
+
+  [email body here]
+
+  ---
+
+  STUDENT PROFILE:
+  Name: ${studentProfile.name}
+  Grade: ${studentProfile.grade}
+  School: ${studentProfile.school}
+  Interests: ${studentProfile.interests}
+  Experience: ${studentProfile.experience}
+  Goal: ${studentProfile.goal || "explore research opportunities"}
+
+  PROFESSOR PROFILE:
+  Name: ${professorData.name}
+  Institution: ${professorData.institution}
+  Department: ${professorData.department}
+  Email: ${professorData.email}
+  Research: ${professorData.researchSummary?.slice(0, 500) || "Not available"}
+
+  Write the email now:`;
+}
+
 
 init().catch(console.error);
