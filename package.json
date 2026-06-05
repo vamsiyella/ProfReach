@@ -1,0 +1,22 @@
+{
+  "name": "profreach",
+  "version": "1.0.0",
+  "description": "Chrome extension for generating personalized cold emails to professors using local AI",
+  "type": "module",
+  "scripts": {
+    "dev": "vite build --watch",
+    "build": "vite build",
+    "pack": "npm run build && cd dist && zip -r ../profreach-v1.0.0.zip .",
+    "preview": "node scripts/preview.js"
+  },
+  "dependencies": {
+    "@mlc-ai/web-llm": "^0.2.73"
+  },
+  "devDependencies": {
+    "vite": "^5.2.0",
+    "@types/chrome": "^0.0.268"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ProfReach</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Views are rendered by popup.js -->
+    <div id="view-loading" class="view active">
+      <div class="splash">
+        <div class="logo-mark">PR</div>
+        <p class="loading-text">Starting up…</p>
+      </div>
+    </div>
+
+    <div id="view-license" class="view">
+      <div class="panel">
+        <div class="logo-mark small">PR</div>
+        <h1>Activate ProfReach</h1>
+        <p class="subtitle">Enter your license key to get started.</p>
+        <input
+          type="text"
+          id="license-input"
+          placeholder="XXXX-XXXX-XXXX-XXXX"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <div id="license-error" class="error-msg hidden"></div>
+        <button id="activate-btn" class="btn-primary">Activate</button>
+        <a href="https://yoursite.com/pricing" target="_blank" class="link">Get a license key →</a>
+      </div>
+    </div>
+
+    <div id="view-main" class="view">
+      <!-- Header -->
+      <header class="app-header">
+        <span class="logo-inline">ProfReach</span>
+        <button id="profile-toggle" class="icon-btn" title="Edit your profile">⚙</button>
+      </header>
+
+      <!-- Model status bar (shown while loading) -->
+      <div id="model-bar" class="model-bar hidden">
+        <div id="model-progress-fill" class="model-progress-fill" style="width:0%"></div>
+        <span id="model-status-text">Loading AI model…</span>
+      </div>
+
+      <!-- Tab bar -->
+      <div class="tab-bar">
+        <button class="tab active" data-tab="professor">Professor</button>
+        <button class="tab" data-tab="email">Email</button>
+      </div>
+
+      <!-- Professor tab -->
+      <div id="tab-professor" class="tab-content active">
+        <div class="section-label">Extracted from page</div>
+
+        <div class="field-group">
+          <label>Name</label>
+          <input type="text" id="prof-name" placeholder="Professor's name" />
+        </div>
+        <div class="field-group">
+          <label>Email</label>
+          <input type="email" id="prof-email" placeholder="professor@university.edu" />
+        </div>
+        <div class="field-group">
+          <label>Institution</label>
+          <input type="text" id="prof-institution" placeholder="University name" />
+        </div>
+        <div class="field-group">
+          <label>Department</label>
+          <input type="text" id="prof-department" placeholder="Department" />
+        </div>
+        <div class="field-group">
+          <label>Research Summary</label>
+          <textarea id="prof-research" rows="4" placeholder="What does this professor research?"></textarea>
+        </div>
+
+        <div class="action-row">
+          <button id="re-extract-btn" class="btn-secondary">↺ Re-extract</button>
+          <button id="generate-btn" class="btn-primary" disabled>Generate Email</button>
+        </div>
+      </div>
+
+      <!-- Email tab -->
+      <div id="tab-email" class="tab-content">
+        <div id="email-placeholder" class="placeholder-state">
+          <p>Fill in the professor info and click <strong>Generate Email</strong> to get started.</p>
+        </div>
+
+        <div id="email-output" class="hidden">
+          <div class="field-group">
+            <label>Subject</label>
+            <div id="email-subject" class="output-line"></div>
+          </div>
+          <div class="field-group">
+            <label>Body</label>
+            <div id="email-body" class="output-box"></div>
+          </div>
+
+          <div class="action-row">
+            <button id="regenerate-btn" class="btn-secondary">↺ Regenerate</button>
+            <button id="copy-btn" class="btn-secondary">Copy</button>
+            <button id="gmail-btn" class="btn-primary">Open in Gmail</button>
+          </div>
+
+          <button id="followup-btn" class="btn-ghost">+ Generate Follow-up</button>
+        </div>
+
+        <div id="email-generating" class="hidden generating-state">
+          <div class="spinner"></div>
+          <p id="generating-text">Writing your email…</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile slide-in panel -->
+    <div id="profile-panel" class="side-panel hidden">
+      <div class="side-panel-header">
+        <h2>Your Profile</h2>
+        <button id="profile-close" class="icon-btn">✕</button>
+      </div>
+      <div class="field-group">
+        <label>Your Name</label>
+        <input type="text" id="student-name" placeholder="Full name" />
+      </div>
+      <div class="field-group">
+        <label>Grade</label>
+        <select id="student-grade">
+          <option value="9th grade">9th Grade</option>
+          <option value="10th grade">10th Grade</option>
+          <option value="11th grade" selected>11th Grade</option>
+          <option value="12th grade">12th Grade</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label>School</label>
+        <input type="text" id="student-school" placeholder="High school name" />
+      </div>
+      <div class="field-group">
+        <label>Research Interests</label>
+        <textarea id="student-interests" rows="3" placeholder="e.g., NMR spectroscopy, machine learning, music technology…"></textarea>
+      </div>
+      <div class="field-group">
+        <label>Relevant Experience</label>
+        <textarea id="student-experience" rows="3" placeholder="e.g., Research assistant at Georgia Tech, built X project, published Y…"></textarea>
+      </div>
+      <div class="field-group">
+        <label>Your Ask / Goal</label>
+        <input type="text" id="student-goal" placeholder="e.g., informational interview, lab visit, reading group…" />
+      </div>
+      <button id="save-profile-btn" class="btn-primary full-width">Save Profile</button>
+    </div>
+  </div>
+
+  <script type="module" src="popup.js"></script>
+</body>
+</html>
