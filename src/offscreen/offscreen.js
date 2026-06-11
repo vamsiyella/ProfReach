@@ -5,7 +5,7 @@
  */
 import * as webllm from "@mlc-ai/web-llm";
 
-const MODEL_ID = "Phi-3-mini-4k-instruct-q4f16_1-MLC";
+const MODEL_ID = "TinyLlama-1.1B-Chat-v0.4-q4f16_1-MLC";
 
 let engine   = null;
 let loaded   = false;

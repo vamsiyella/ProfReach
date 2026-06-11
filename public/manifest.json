@@ -12,7 +12,7 @@
   "content_scripts": [{ "matches": ["<all_urls>"], "js": ["content.js"], "run_at": "document_idle" }],
   "permissions": ["storage", "activeTab", "scripting", "offscreen", "identity"],
   "oauth2": {
-    "client_id": "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com",
+    "client_id": "22609115072-2tj0mrlfnbadgm78niadk8dh21bioqqm.apps.googleusercontent.com",
     "scopes": ["https://www.googleapis.com/auth/gmail.compose"]
   },
   "host_permissions": ["<all_urls>"],
