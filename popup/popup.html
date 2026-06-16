@@ -9,7 +9,7 @@
 <body>
 <div id="app">
 
-  <!-- ── LOADING SPLASH ─────────────────────────────────────────────── -->
+  <!-- ── LOADING ───────────────────────────────────────────────────── -->
   <div id="view-loading" class="view active">
     <div class="splash">
       <div class="logo-mark">PR</div>
@@ -17,7 +17,7 @@
     </div>
   </div>
 
-  <!-- ── LICENSE SCREEN ────────────────────────────────────────────── -->
+  <!-- ── LICENSE ───────────────────────────────────────────────────── -->
   <div id="view-license" class="view">
     <div class="panel">
       <div class="logo-mark small">PR</div>
@@ -30,84 +30,79 @@
     </div>
   </div>
 
-  <!-- ── MAIN SCREEN ───────────────────────────────────────────────── -->
+  <!-- ── MAIN ──────────────────────────────────────────────────────── -->
   <div id="view-main" class="view">
 
-    <!-- Header -->
     <header class="app-header">
       <span class="logo-inline">ProfReach</span>
       <div class="header-right">
-        <span id="model-status-badge" class="status-badge loading">● Model loading…</span>
+        <span id="model-status-badge" class="status-badge loading">● Loading…</span>
+        <button id="history-toggle" class="icon-btn" title="Email history">🕐</button>
         <button id="profile-toggle" class="icon-btn" title="Your profile">⚙</button>
       </div>
     </header>
 
-    <!-- Slim model progress bar -->
+    <!-- Model bar (slim, usually hidden once ready) -->
     <div id="model-bar" class="model-bar hidden">
       <div id="model-progress-fill" class="model-progress-fill" style="width:0%"></div>
       <span id="model-status-text">Loading AI model…</span>
     </div>
 
-    <!-- Two-column body -->
     <div class="main-columns">
 
       <!-- LEFT — Professor Info -->
       <div class="col col-left">
-        <div class="col-label">
-          Professor Info
-          <span class="col-hint">Auto-extracted from page</span>
-        </div>
+        <div class="col-label">Professor Info <span class="col-hint">auto-extracted from page</span></div>
 
         <div class="field-group">
           <label>Name</label>
           <input type="text" id="prof-name" placeholder="Professor's name" />
         </div>
+
         <div class="field-group">
           <label>Email</label>
           <input type="email" id="prof-email" placeholder="professor@university.edu" />
         </div>
+
         <div class="field-row">
           <div class="field-group">
             <label>Institution</label>
             <input type="text" id="prof-institution" placeholder="University" />
           </div>
           <div class="field-group">
-            <label>Department</label>
-            <input type="text" id="prof-department" placeholder="Dept." />
+            <label>Dept.</label>
+            <input type="text" id="prof-department" placeholder="Department" />
           </div>
         </div>
-        <div class="field-group">
+
+        <div class="field-group research-group">
           <label>Research Summary <span class="field-hint-inline">trim to what's relevant</span></label>
-          <textarea id="prof-research" rows="5" placeholder="What does this professor research? The more specific this is, the better the email."></textarea>
+          <textarea id="prof-research" rows="4" placeholder="What does this professor research? More specific = better email."></textarea>
         </div>
 
         <div class="col-actions">
-          <button id="re-extract-btn" class="btn-secondary">↺ Re-extract</button>
+          <button id="re-extract-btn" class="btn-secondary btn-sm">↺ Re-extract</button>
           <button id="generate-btn" class="btn-primary" disabled>✦ Generate Email</button>
         </div>
       </div>
 
-      <!-- DIVIDER -->
       <div class="col-divider"></div>
 
       <!-- RIGHT — Email Output -->
       <div class="col col-right">
         <div class="col-label">Generated Email</div>
 
-        <!-- Placeholder state -->
         <div id="email-placeholder" class="placeholder-state">
           <div class="placeholder-icon">✦</div>
-          <p>Fill in professor info on the left,<br>then click <strong>Generate Email</strong>.</p>
-          <p class="placeholder-sub">Fill your profile in ⚙ settings first.</p>
+          <p>Fill in professor info,<br>then click <strong>Generate Email</strong>.</p>
+          <p class="placeholder-sub">Open ⚙ to set your profile first.</p>
         </div>
 
-        <!-- Generating state -->
         <div id="email-generating" class="hidden generating-state">
           <div class="spinner"></div>
           <p id="generating-text">Writing your email…</p>
         </div>
 
-        <!-- Output -->
         <div id="email-output" class="hidden email-output-area">
           <div class="field-group">
             <label>Subject</label>
@@ -118,10 +113,10 @@
             <div id="email-body" class="output-box"></div>
           </div>
           <div class="email-actions">
-            <button id="regenerate-btn" class="btn-secondary btn-sm">↺ Regenerate</button>
+            <button id="regenerate-btn" class="btn-secondary btn-sm">↺ Regen</button>
             <button id="copy-btn" class="btn-secondary btn-sm">Copy</button>
             <button id="gmail-btn" class="btn-secondary btn-sm">Open Gmail</button>
-            <button id="draft-btn" class="btn-primary btn-sm">Save as Draft</button>
+            <button id="draft-btn" class="btn-primary btn-sm">Save Draft</button>
           </div>
           <button id="followup-btn" class="btn-ghost">+ Generate Follow-up Email</button>
         </div>
@@ -129,13 +124,12 @@
     </div>
   </div>
 
-  <!-- ── PROFILE PANEL (full overlay) ─────────────────────────────── -->
+  <!-- ── PROFILE PANEL ─────────────────────────────────────────────── -->
   <div id="profile-panel" class="side-panel hidden">
     <div class="side-panel-header">
       <h2>Your Profile</h2>
       <button id="profile-close" class="icon-btn">✕</button>
     </div>
-
     <div class="profile-grid">
       <div class="field-group">
         <label>Your Name</label>
@@ -156,34 +150,43 @@
       </div>
       <div class="field-group">
         <label>Research Interests</label>
-        <textarea id="student-interests" rows="2" placeholder="e.g., NMR spectroscopy, machine learning, Carnatic music AI…"></textarea>
+        <textarea id="student-interests" rows="2" placeholder="e.g., NMR spectroscopy, ML, music AI…"></textarea>
       </div>
     </div>
-
     <div class="field-group mt-8">
-      <label>Relevant Experience <span class="field-hint-inline">real accomplishments only — no AI will add anything you don't list here</span></label>
-      <textarea id="student-experience" rows="5" placeholder="List your actual experience with specifics. e.g.:&#10;- Research Assistant at GT Paravastu Lab (NMR pipeline, Python/BMRB/DSSP)&#10;- GT Center for Music Tech (Haathani AI, pitch tracking)&#10;- Section Lead, Stanford Code in Place&#10;- Co-President, WFHS TSA (~200 members)"></textarea>
+      <label>Relevant Experience <span class="field-hint-inline">only real things — AI won't invent anything not listed</span></label>
+      <textarea id="student-experience" rows="4" placeholder="- Research Assistant at GT Paravastu Lab (NMR, Python/BMRB/DSSP)&#10;- GT Center for Music Tech (Haathani AI, pitch tracking)&#10;- Section Lead, Stanford Code in Place&#10;- Co-President WFHS TSA (~200 members)"></textarea>
     </div>
-
     <div class="field-row mt-8">
       <div class="field-group">
-        <label>Your Ask / Goal</label>
-        <input type="text" id="student-goal" placeholder="e.g., 15-minute call, lab visit…" />
+        <label>Your Ask</label>
+        <input type="text" id="student-goal" placeholder="e.g., 15-min call, lab visit…" />
       </div>
       <div class="field-group">
         <label>How you found them</label>
-        <input type="text" id="student-discovery" placeholder="e.g., read their paper on X, debate topic on Y…" />
+        <input type="text" id="student-discovery" placeholder="e.g., read paper on X…" />
       </div>
     </div>
-
     <div class="field-group mt-8">
       <label class="checkbox-label">
         <input type="checkbox" id="attach-resume" />
-        <span>Add "I have attached my resume" line to email</span>
+        <span>Add resume attachment note to email</span>
       </label>
     </div>
-
     <button id="save-profile-btn" class="btn-primary full-width mt-8">Save Profile</button>
+  </div>
+
+  <!-- ── HISTORY PANEL ─────────────────────────────────────────────── -->
+  <div id="history-panel" class="side-panel hidden">
+    <div class="side-panel-header">
+      <h2>Email History</h2>
+      <button id="history-close" class="icon-btn">✕</button>
+    </div>
+    <div id="history-empty" class="placeholder-state" style="flex:1">
+      <div class="placeholder-icon">🕐</div>
+      <p>No emails generated yet.<br>Your history will appear here.</p>
+    </div>
+    <div id="history-list" class="history-list hidden"></div>
   </div>
 
 </div>
